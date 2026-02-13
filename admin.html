@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+</head>
+<body>
+  <h2>🔥 Admin Panel</h2>
+  <p id="adminEmail">Loading...</p>
+
+  <hr>
+
+  <h3>Add New Novel</h3>
+  <input type="text" id="novelTitle" placeholder="Novel Title" />
+  <br><br>
+  <textarea id="novelDesc" placeholder="Novel Description"></textarea>
+  <br><br>
+  <button id="addNovelBtn">Add Novel</button>
+
+  <hr>
+  <button id="logoutBtn">Logout</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbVpUncGYuGntuZslT3brB5rqCMJpiEfY",
+      authDomain: "n-novel.firebaseapp.com",
+      projectId: "n-novel",
+      storageBucket: "n-novel.firebasestorage.app",
+      messagingSenderId: "647987747126",
+      appId: "1:647987747126:web:c9669690a1ad069762fb97",
+      measurementId: "G-MSHVQW895M"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists() || snap.data().role !== "admin") {
+        alert("Access Denied ❌ Admin only");
+        window.location.href = "profile.html";
+        return;
+      }
+
+      document.getElementById("adminEmail").innerText =
+        "Logged in as Admin: " + user.email;
+    });
+
+    document.getElementById("addNovelBtn").addEventListener("click", async () => {
+      const title = document.getElementById("novelTitle").value;
+      const desc = document.getElementById("novelDesc").value;
+
+      if (!title) {
+        alert("Enter novel title");
+        return;
+      }
+
+      await addDoc(collection(db, "novels"), {
+        title: title,
+        description: desc,
+        createdAt: new Date()
+      });
+
+      alert("Novel added!");
+      document.getElementById("novelTitle").value = "";
+      document.getElementById("novelDesc").value = "";
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login / Signup</title>
+</head>
+<body>
+  <h2>Login / Signup</h2>
+
+  <input type="email" id="email" placeholder="Email" />
+  <br><br>
+  <input type="password" id="password" placeholder="Password" />
+  <br><br>
+  <input type="text" id="name" placeholder="Name (for signup)" />
+  <br><br>
+
+  <button id="loginBtn">Login</button>
+  <button id="signupBtn">Signup</button>
+
+  <script type="module">
+    import { login, signup, checkAuthState } from './auth.js';
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      login(email, password);
+    });
+
+    document.getElementById("signupBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const name = document.getElementById("name").value;
+      signup(email, password, name);
+    });
+
+
+    checkAuthState((user) => {
+      if (user) {
+        window.location.href = "home.html";
+      }
+    });
+  </script>
+</body>
+</html>
